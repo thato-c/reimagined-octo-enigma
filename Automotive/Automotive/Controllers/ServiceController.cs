@@ -1,5 +1,6 @@
 ﻿using Automotive.Interfaces;
 using Automotive.Models;
+using Automotive.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -73,6 +74,52 @@ namespace Automotive.Controllers
         public IActionResult Create()
         {
             return View();
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult Create(ServiceViewModel viewModel)
+        {
+            try
+            {
+                if (ModelState.IsValid)
+                {
+                    // Map the viewModel to the SService Model
+                    var service = new Models.Service
+                    {
+                        Name = viewModel.Name,
+                        Description = viewModel.Description,
+                        Price = viewModel.Price,
+                        LaborHours = viewModel.LaborHours,
+                        WarrantyInMonths = viewModel.WarrantyInMonths,
+                    };
+
+                    // Add and save the new service to the database
+                    serviceRepository.InsertService(service);
+                    serviceRepository.Save();
+                    return RedirectToAction("Index");
+                }
+                return View(viewModel);
+            }
+            catch (DbUpdateException ex)
+            {
+                // Log the exception detai;s
+                _logger.LogError(ex, "An error occurred while inserting data into the database.");
+
+                // Optionally, log additional details
+                if (ex.InnerException != null)
+                {
+                    _logger.LogError("Inner Exception: {Message}", ex.InnerException.Message);
+                }
+                if (ex.InnerException?.InnerException != null)
+                {
+                    _logger.LogError("SQL: {Message}", ex.InnerException.InnerException.Message);
+                }
+
+                ModelState.AddModelError("", "An error occurred while inserting data into the database.");
+                ViewBag.Message = "An error occurred while inserting data into the database.";
+                return View();
+            }
         }
     }
 }
