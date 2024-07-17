@@ -16,6 +16,7 @@ namespace Automotive.Controllers
             this.serviceRepository = serviceRepository;
         }
 
+        [HttpGet]
         public async Task<IActionResult> Index(string sortOrder, string searchString, string currentFilter, int? pageNumber)
         {
             try
@@ -66,6 +67,12 @@ namespace Automotive.Controllers
                 ViewBag.Message = "An error occurred while retrieving data from the database.";
                 return View();
             }
+        }
+
+        [HttpGet]
+        public IActionResult Create()
+        {
+            return View();
         }
     }
 }
