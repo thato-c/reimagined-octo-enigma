@@ -289,5 +289,113 @@ namespace Automotive.Controllers
             }
         }
 
+        [HttpGet]
+        public async Task<IActionResult> Delete(Guid serviceId)
+        {
+            try
+            {
+                var service = await serviceRepository.GetServiceByIdAsync(serviceId);
+
+                if (service == null)
+                {
+                    ViewBag.Message = "The service has not been found.";
+                    return View();
+                }
+
+                var viewModel = new ServiceDetailViewModel
+                {
+                    ServiceId = service.ServiceId,
+                    Name = service.Name,
+                    Description = service.Description,
+                    Price = service.Price,
+                    LaborHours = service.LaborHours,
+                    WarrantyInMonths = service.WarrantyInMonths,
+                    RowVersion = service.RowVersion,
+                };
+
+                return View(viewModel);
+            }
+            catch (DbUpdateException ex)
+            {
+                // Log the exception details
+                _logger.LogError(ex, "An error occurred while retrieving data from the database.");
+
+                // Optionally, log additional details
+                if (ex.InnerException != null)
+                {
+                    _logger.LogError("Inner Exception: {Message}", ex.InnerException.Message);
+                }
+                if (ex.InnerException?.InnerException != null)
+                {
+                    _logger.LogError("SQL: {Message}", ex.InnerException?.InnerException.Message);
+                }
+
+                ModelState.AddModelError("", "An error occurred while retrieving data from the database.");
+                ViewBag.Message = "An error occurred while retrieving data from the database.";
+                return View();
+            }
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Delete(ServiceDetailViewModel viewModel)
+        {
+            try
+            {
+                if (ModelState.IsValid)
+                {
+                    var serviceToDelete = await serviceRepository.GetServiceByIdAsync(viewModel.ServiceId);
+
+                    if (serviceRepository == null)
+                    {
+                        ViewBag.Message = "Service was not found.";
+                        return View();
+                    }
+
+                    try
+                    {
+                        await serviceRepository.DeleteService(viewModel.ServiceId);
+                        await serviceRepository.SaveAsync();
+                        return RedirectToAction("Index");
+                    }
+                    catch (DbUpdateConcurrencyException ex)
+                    {
+                        var ExceptionEntry = ex.Entries.Single();
+                        var databaseEntry = ExceptionEntry.GetDatabaseValues();
+                        if (databaseEntry == null)
+                        {
+                            ModelState.AddModelError(string.Empty, "Unable to save the changes. The student has been deleted by another user.");
+                        }
+                        else
+                        {
+                            ModelState.AddModelError(string.Empty, "Concurrency error occurred.");
+                        }
+                        return View();
+                    }
+                }
+
+                return View(viewModel);
+            }
+            catch (DbUpdateException ex)
+            {
+                // Log the additional details
+                _logger.LogError(ex, "An error occurred while removing data from the database.");
+
+                // Optionally, log additional details
+                if (ex.InnerException != null)
+                {
+                    _logger.LogError("Inner Exception: {Message}", ex.InnerException.Message);
+                }
+                if (ex.InnerException?.InnerException != null)
+                {
+                    _logger.LogError("SQL: {Message}", ex.InnerException.InnerException.Message);
+                }
+
+                ModelState.AddModelError("", "An error occurred while removing data from the database.");
+                ViewBag.Message = "An error occurred while removing data from the database.";
+                return View();
+            }
+        }
+
     }
 }

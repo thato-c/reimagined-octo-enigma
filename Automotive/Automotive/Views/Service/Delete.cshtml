@@ -1,0 +1,38 @@
+﻿@using Automotive.ViewModels
+@model ServiceDetailViewModel
+
+<h1>Edit Service</h1>
+
+<form asp-controller="Service" asp-action="Delete" method="post">
+    @Html.AntiForgeryToken()
+    <div asp-validation-summary="All" class="text-danger"></div>
+    <input type="hidden" asp-for="ServiceId" />
+    <input type="hidden" asp-for="RowVersion" />
+
+    <div class="form-group">
+        <label asp-for="Name">Name</label>
+        <input asp-for="Name" class="form-control" readonly />
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Description">Description</label>
+        <input asp-for="Description" class="form-control" readonly />
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Price">Price</label>
+        <input asp-for="Price" class="form-control" readonly />
+    </div>
+
+    <div class="form-group">
+        <label asp-for="LaborHours">Labor Hours</label>
+        <input asp-for="LaborHours" class="form-control" readonly />
+    </div>
+
+    <div class="form-group">
+        <label asp-for="WarrantyInMonths">Warranty (Months)</label>
+        <input asp-for="WarrantyInMonths" class="form-control" readonly />
+    </div>
+
+    <button type="submit">Delete</button>
+</form>
