@@ -10,6 +10,7 @@ builder.Services.AddDbContext<AutomotiveDBContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("Dev"))
 );
 builder.Services.AddScoped<IServiceRepository, ServiceRepository>();
+builder.Services.AddScoped<IVehicleRepository, VehicleRepository>();
 
 builder.Services.AddControllersWithViews();
 
