@@ -7,7 +7,12 @@ namespace Automotive.Repositories
 {
     public class ServiceRepository : IServiceRepository, IDisposable
     {
-        private AutomotiveDBContext context;
+        private readonly AutomotiveDBContext context;
+
+        public ServiceRepository(AutomotiveDBContext context)
+        {
+            this.context = context;
+        }
 
         public async Task<Service> DeleteService(Guid serviceId)
         {

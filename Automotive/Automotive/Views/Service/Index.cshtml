@@ -1,1 +1,91 @@
-﻿<h1>Services</h1>
+﻿@model PaginatedList<Automotive.Models.Service>
+
+<h1>Services</h1>
+<a asp-controller="Service" asp-action="Create">Create</a>
+<br />
+<br />
+
+<form asp-action="Index" method="get">
+    <div class="form-actions no-color">
+        <p>
+            Find by name: <input type="text" name="SearchString" value="@ViewBag.CurrentFilter" />
+            <input type="submit" value="Search" class="btn btn-default" /> | <a asp-action="Index">Back to Full List</a>
+        </p>
+    </div>
+</form>
+
+@if (Model != null)
+{
+    <table class="table">
+        <tr>
+            <th>
+                Name
+            </th>
+            <th>
+                Description
+            </th>
+            <th>
+                Price
+            </th>
+            <th>
+                Labor Hours
+            </th>
+            <th>
+                Warranty (Months)
+            </th>
+            <th></th>
+            <th></th>
+        </tr>
+        @foreach (var service in Model)
+        {
+            if (service != null)
+            {
+                <tr>
+                    <td>
+                        @service.Name
+                    </td>
+                    <td>
+                        @service.Description
+                    </td>
+                    <td>
+                        @service.Price
+                    </td>
+                    <td>
+                        @service.LaborHours
+                    </td>
+                    <td>
+                        @service.WarrantyInMonths
+                    </td>
+                    <td>
+                        <a asp-controller="Service" asp-action="Edit" asp-route-ServiceId="@service.ServiceId">Edit</a>
+                    </td>
+                    <td>
+                        <a asp-controller="Service" asp-action="Delete" asp-route-ServiceId="@service.ServiceId">Delete</a>
+                    </td>
+                </tr>
+            }
+        }
+    </table>
+    var prevDisabled = !Model.HasPreviousPage ? "disabled" : "";
+    var nextDisabled = !Model.HasNextPage ? "disabled" : "";
+
+    <a asp-action="Index"
+        asp-route-sortOrder="@ViewData["CurrentSort"]"
+        asp-route-pageNumber="@(Model.PageIndex - 1)"
+        asp-route-currentFilter="@ViewData["CurrentFilter"]"
+        class="btn btn-default @prevDisabled">
+        Previous
+    </a>
+
+    <a asp-action="Index"
+       asp-route-sortOrder="@ViewData["CurrentSort"]"
+       asp-route-pageNumber="@(Model.PageIndex + 1)"
+       asp-route-currentFilter="@ViewData["CurrentFilter"]"
+       class="btn btn-default @nextDisabled">
+        Next
+    </a>
+}
+else
+{
+    <p>@ViewBag.Message</p>
+}
